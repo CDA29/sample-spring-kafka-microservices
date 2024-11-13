@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Microservices Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.0/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Microservices Dashboard</h1>
+    <div>
+        <h2>Orders</h2>
+        <canvas id="ordersChart" width="400" height="200"></canvas>
+    </div>
+    <script th:inline="javascript">
+        var socket = new SockJS('/ws');
+        var stompClient = Stomp.over(socket);
+        var ordersChart;
+
+        stompClient.connect({}, function (frame) {
+            console.log('Connected: ' + frame);
+            stompClient.subscribe('/topic/orders', function (orderMessage) {
+                updateOrdersChart(JSON.parse(orderMessage.body));
+            });
+        });
+
+        function updateOrdersChart(order) {
+            if (!ordersChart) {
+                var ctx = document.getElementById('ordersChart').getContext('2d');
+                ordersChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['New', 'Paid', 'Confirmed', 'Rejected'],
+                        datasets: [{
+                            label: '# of Orders',
+                            data: [0, 0, 0, 0],
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.2)',
+                                'rgba(54, 162, 235, 0.2)',
+                                'rgba(75, 192, 192, 0.2)',
+                                'rgba(255, 206, 86, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(255, 206, 86, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+
+            var statusIndex;
+            switch(order.status) {
+                case 'NEW':
+                    statusIndex = 0;
+                    break;
+                case 'PAID':
+                    statusIndex = 1;
+                    break;
+                case 'CONFIRMED':
+                    statusIndex = 2;
+                    break;
+                case 'REJECTED':
+                    statusIndex = 3;
+                    break;
+            }
+
+            ordersChart.data.datasets[0].data[statusIndex]++;
+            ordersChart.update();
+        }
+    </script>
+</body>
+</html>

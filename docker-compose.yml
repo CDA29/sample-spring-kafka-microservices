@@ -27,3 +27,25 @@ services:
       - broker
     environment:
       SPRING_PROFILES_ACTIVE: docker
+  dashboard-service:
+    image: sample-spring-kafka-microservices/dashboard-service:1.0-SNAPSHOT
+    ports:
+      - "8081:8081"
+    links:
+      - broker
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+  kafka-ui:
+    container_name: kafka-ui
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - "8888:8080"
+    depends_on:
+      - broker
+    environment:
+      DYNAMIC_CONFIG_ENABLED: 'true'
+      KAFKA_CLUSTERS_0_NAME: wizard_test
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: broker:9092
+    links:
+      - broker
+

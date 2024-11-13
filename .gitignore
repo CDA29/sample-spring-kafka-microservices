@@ -3,3 +3,7 @@
 /order-service/target/
 /payment-service/target/
 /stock-service/target/
+/dashboard-service/target/
+.aider*
+.env
+.idea/

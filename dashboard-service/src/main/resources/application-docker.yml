@@ -1,0 +1,4 @@
+spring.application.name: dashboard
+spring.kafka.bootstrap-servers: broker:9092
+server:
+  port: 8081

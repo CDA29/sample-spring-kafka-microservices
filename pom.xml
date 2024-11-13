@@ -21,6 +21,7 @@
         <module>payment-service</module>
         <module>base-domain</module>
         <module>stock-service</module>
+        <module>dashboard-service</module>
     </modules>
 
     <build>

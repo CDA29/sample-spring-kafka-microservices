@@ -32,27 +32,41 @@
         <h2>Real-time Order Processing</h2>
         <canvas id="realTimeOrdersChart"></canvas>
     </div>
-
     <script th:inline="javascript">
         var socket = new SockJS('/ws');
         var stompClient = Stomp.over(socket);
+        var reconnectInterval = 5000;
         var ordersChart, kafkaMessagesChart, microservicesHealthChart, realTimeOrdersChart;
+        function connect() {
+            stompClient.connect({}, function (frame) {
+                console.log('Connected: ' + frame);
+                stompClient.subscribe('/topic/orders', function (orderMessage) {
+                    console.log(orderMessage);
+                    updateOrdersChart(JSON.parse(orderMessage.body));
+                });
+                stompClient.subscribe('/topic/kafka', function (kafkaMessage) {
+                    console.log(kafkaMessage);
+                    updateKafkaMessagesChart(JSON.parse(kafkaMessage.body));
+                });
+                stompClient.subscribe('/topic/microservices', function (healthMessage) {
+                    console.log(healthMessage);
+                    updateMicroservicesHealthChart(JSON.parse(healthMessage.body));
+                });
+                stompClient.subscribe('/topic/realtime-orders', function (realtimeOrderMessage) {
+                    console.log(realtimeOrderMessage);
+                    updateRealTimeOrdersChart(JSON.parse(realtimeOrderMessage.body));
+                });
+            }, function (error) {
+                console.log('WebSocket connection error: ' + error);
+                setTimeout(connect, reconnectInterval);
+            });
+        }
+        connect();
 
-        stompClient.connect({}, function (frame) {
-            console.log('Connected: ' + frame);
-            stompClient.subscribe('/topic/orders', function (orderMessage) {
-                updateOrdersChart(JSON.parse(orderMessage.body));
-            });
-            stompClient.subscribe('/topic/kafka', function (kafkaMessage) {
-                updateKafkaMessagesChart(JSON.parse(kafkaMessage.body));
-            });
-            stompClient.subscribe('/topic/microservices', function (healthMessage) {
-                updateMicroservicesHealthChart(JSON.parse(healthMessage.body));
-            });
-            stompClient.subscribe('/topic/realtime-orders', function (realtimeOrderMessage) {
-                updateRealTimeOrdersChart(JSON.parse(realtimeOrderMessage.body));
-            });
-        });
+        socket.onclose = function () {
+            console.log('WebSocket connection closed');
+            setTimeout(connect, reconnectInterval);
+        };
 
         function updateOrdersChart(order) {
                 if (!ordersChart) {

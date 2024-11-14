@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.piomin.base.domain.Order;
 
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 @RestController
@@ -28,7 +29,9 @@ public class StatisticsController {
     }
 
     @GetMapping("/stats")
-    public long getPaymentCount() {
-        return paymentCount.get();
-    }
+    public Map<String, Long> getPaymentCount() {
+        System.out.println("Payment count: " + paymentCount);
+        // retour un json
+
+        return Map.of("paymentCount", paymentCount.get());    }
 }

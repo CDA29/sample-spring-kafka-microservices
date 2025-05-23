@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.5</version>
+        <version>3.5.0</version>
         <relativePath/>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -64,7 +64,7 @@
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>kafka</artifactId>
-            <version>1.20.3</version>
+            <version>1.21.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -96,7 +96,7 @@
                     <plugin>
                         <groupId>com.google.cloud.tools</groupId>
                         <artifactId>jib-maven-plugin</artifactId>
-                        <version>3.4.4</version>
+                        <version>3.4.5</version>
                         <configuration>
                             <to>
                                 <image>sample-spring-kafka-microservices/${project.artifactId}:${project.version}</image>
